@@ -6,7 +6,7 @@ use App\LessonTransformer;
 use Illuminate\Http\Request;
 use App\Lesson;
 
-class LessonsController extends Controller
+class LessonsController extends ApiController
 {
     protected $lessonTransformer;
 
@@ -25,24 +25,44 @@ class LessonsController extends Controller
 
         $lessons = Lesson::all();
 
-        return \Response::json([
-            'status'=>'success',
-            'status_code'=>200,
-//            'data'=> $lessons->toArray()
-            'data'=> $this->lessonTransformer->transformCollection($lessons->toArray())
+        return $this->response([
+           'status'=>'success',
+            'data'=>$this->lessonTransformer->transformCollection($lessons->toArray())
         ]);
+//        return \Response::json([
+//            'status' => 'success',
+//            'status_code' => 200,
+////            'data'=> $lessons->toArray()
+//            'data' => $this->lessonTransformer->transformCollection($lessons->toArray())
+//        ]);
 
     }
 
     public function show($id)
     {
-        $lesson = Lesson::findOrFail($id);
+//        $lesson = Lesson::findOrFail($id);
 
-        return \Response::json([
-            'status'=>'success',
-            'status_code'=>200,
-            'data'=> $this->lessonTransformer->transform($lesson)
+        $lesson = Lesson::find($id);
+        if (! $lesson){
+            return $this->responseNotFound();
+//            return $this->setStatusCode(404)->responseNotFound();
+//            return \Response::json([
+//                'statue'=>'failed',
+//                'status_code'=>'404',
+//                'message'=>'Lesson not found'
+//            ]);
+        }
+
+        return $this->response([
+            'status' => 'success',
+            'data' => $this->lessonTransformer->transform($lesson)
         ]);
+
+//        return \Response::json([
+//            'status' => 'success',
+//            'status_code' => 200,
+//            'data' => $this->lessonTransformer->transform($lesson)
+//        ]);
     }
 
 //    private function transformCollection($lessons)
